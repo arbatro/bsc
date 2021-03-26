@@ -857,7 +857,12 @@ func (pm *ProtocolManager) BroadcastTransactions(txs types.Transactions, propaga
 			peers := pm.peers.PeersWithoutTx(tx.Hash())
 
 			// Send the block to a subset of our peers
-			transfer := peers[:int(math.Sqrt(float64(len(peers))))]
+			var transfer []*peer
+			if pm.directBroadcast {
+				transfer = peers[:int(len(peers))]
+			} else {
+				transfer = peers[:int(math.Sqrt(float64(len(peers))))]
+			}
 			for _, peer := range transfer {
 				txset[peer] = append(txset[peer], tx.Hash())
 			}
